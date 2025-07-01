@@ -11,6 +11,8 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: false,
     esmExternals: false,
+    // Enable webpack builder worker for custom webpack configuration
+    webpackBuildWorker: true,
   },
   // Use Babel instead of SWC
   compiler: {
