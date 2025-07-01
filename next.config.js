@@ -6,12 +6,27 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  // Disable SWC completely to avoid native addon issues
+  swcMinify: false,
   experimental: {
     forceSwcTransforms: false,
+    esmExternals: false,
   },
-  swcMinify: false,
+  // Use Babel instead of SWC
   compiler: {
     removeConsole: false,
+  },
+  // Webpack configuration to handle the build
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Fallback for when SWC fails
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+    }
+    
+    return config
   },
   async redirects() {
     return [
