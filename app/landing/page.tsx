@@ -44,6 +44,7 @@ export default function LandingPage() {
   const [result, setResult] = useState<CrawlResult | null>(null)
   const [logs, setLogs] = useState<string[]>([])
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleLoaderComplete = () => {
     setShowLoader(false)
@@ -54,20 +55,32 @@ export default function LandingPage() {
     setProgress(0)
     setResult(null)
     setLogs([])
+    setError(null)
     setSidebarOpen(true)
 
+    let reader: ReadableStreamDefaultReader<Uint8Array> | null = null
+
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => {
+        controller.abort()
+      }, 30000) // 30 second client-side timeout
+
       const response = await fetch('/api/crawl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url }),
+        signal: controller.signal,
       })
 
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const errorText = await response.text()
+        throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
-      const reader = response.body?.getReader()
+      reader = response.body?.getReader()
       if (!reader) throw new Error('No response body')
 
       const decoder = new TextDecoder()
@@ -94,6 +107,10 @@ export default function LandingPage() {
                 setResult(data.result)
                 setProgress(100)
                 setIsLoading(false)
+              } else if (data.type === 'error') {
+                setError(data.message)
+                setLogs(prev => [...prev, `❌ ${data.message}`])
+                setIsLoading(false)
               }
             } catch (e) {
               console.warn('Failed to parse SSE data:', line)
@@ -103,8 +120,31 @@ export default function LandingPage() {
       }
     } catch (error) {
       console.error('Crawl failed:', error)
-      setLogs(prev => [...prev, `Error: ${error instanceof Error ? error.message : 'Unknown error'}`])
+      
+      let errorMessage = 'Unknown error occurred'
+      
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          errorMessage = 'Request timed out. The crawl took too long to complete.'
+        } else if (error.message.includes('fetch')) {
+          errorMessage = 'Connection lost. The server may be overloaded or the crawl timed out.'
+        } else {
+          errorMessage = error.message
+        }
+      }
+      
+      setError(errorMessage)
+      setLogs(prev => [...prev, `❌ Error: ${errorMessage}`])
       setIsLoading(false)
+    } finally {
+      // Clean up reader
+      if (reader) {
+        try {
+          await reader.cancel()
+        } catch (e) {
+          console.warn('Failed to cancel reader:', e)
+        }
+      }
     }
   }
 
@@ -142,6 +182,18 @@ export default function LandingPage() {
             <ProgressBar progress={progress} isLoading={isLoading} />
 
             <UrlForm onSubmit={handleCrawl} isLoading={isLoading} />
+
+            {error && (
+              <div className="mt-6 sm:mt-8 p-4 rounded-lg bg-red-900/20 border border-red-500/30">
+                <div className="flex items-center space-x-2">
+                  <span className="text-red-400">⚠️</span>
+                  <p className="text-red-300 text-sm">{error}</p>
+                </div>
+                <p className="text-red-400/70 text-xs mt-2">
+                  This may be due to server timeout or resource limits. Try again with a simpler website.
+                </p>
+              </div>
+            )}
 
             {result && (
               <div className="mt-6 sm:mt-8 animate-in fade-in duration-500">

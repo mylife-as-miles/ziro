@@ -8,6 +8,11 @@ const rateLimitMap = new Map<string, number>()
 const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour
 const MAX_REQUESTS = 1
 
+// Timeout constants for serverless environments
+const MAX_EXECUTION_TIME = 25000 // 25 seconds (well under typical 30s serverless limit)
+const PAGE_LOAD_TIMEOUT = 15000 // 15 seconds for page load
+const INTERACTION_TIMEOUT = 8000 // 8 seconds for user interactions
+
 interface ApiEndpoint {
   method: string
   url: string
@@ -16,6 +21,11 @@ interface ApiEndpoint {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+  let browser: any = null
+  let session: any = null
+  let hb: any = null
+
   try {
     const { url } = await request.json()
     
@@ -54,7 +64,7 @@ export async function POST(request: NextRequest) {
       throw new Error('HYPERBROWSER_API_KEY is not configured')
     }
 
-    const hb = new Hyperbrowser({
+    hb = new Hyperbrowser({
       apiKey: process.env.HYPERBROWSER_API_KEY,
     })
 
@@ -63,7 +73,20 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         const sendSSE = (data: any) => {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`))
+          try {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`))
+          } catch (error) {
+            console.warn('Failed to send SSE data:', error)
+          }
+        }
+
+        // Helper function to check if we're running out of time
+        const checkTimeout = () => {
+          const elapsed = Date.now() - startTime
+          if (elapsed > MAX_EXECUTION_TIME) {
+            throw new Error('Operation timeout - execution time limit reached')
+          }
+          return elapsed
         }
 
         try {
@@ -75,21 +98,37 @@ export async function POST(request: NextRequest) {
           sendSSE({ type: 'log', message: `Starting crawl for ${url}` })
           sendSSE({ type: 'progress', progress: 5 })
 
-          // Create browser session
-          const session = await hb.sessions.create({
-            useStealth: true,
-            useProxy: true
-          })
+          checkTimeout()
+
+          // Create browser session with timeout
+          console.log('Creating browser session...')
+          session = await Promise.race([
+            hb.sessions.create({
+              useStealth: true,
+              useProxy: true
+            }),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Browser session creation timeout')), 10000)
+            )
+          ])
 
           sendSSE({ type: 'log', message: 'Browser session created' })
           sendSSE({ type: 'progress', progress: 15 })
 
-          // Connect with Puppeteer
+          checkTimeout()
+
+          // Connect with Puppeteer with timeout
+          console.log('Connecting to browser...')
           const { connect } = await import('puppeteer-core')
-          const browser = await connect({
-            browserWSEndpoint: session.wsEndpoint,
-            defaultViewport: null,
-          })
+          browser = await Promise.race([
+            connect({
+              browserWSEndpoint: session.wsEndpoint,
+              defaultViewport: null,
+            }),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Browser connection timeout')), 8000)
+            )
+          ])
 
           const [page] = await browser.pages()
           let requestCount = 0
@@ -97,6 +136,9 @@ export async function POST(request: NextRequest) {
           sendSSE({ type: 'log', message: 'Connected to browser' })
           sendSSE({ type: 'progress', progress: 20 })
 
+          checkTimeout()
+
+          // Set up request monitoring with error handling
           page.on('requestfinished', (request) => {
             try {
               const response = request.response()
@@ -112,7 +154,7 @@ export async function POST(request: NextRequest) {
                 const skipPatterns = [
                   /\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i,
                   /google-analytics|googletagmanager|facebook|twitter|linkedin/i,
-                  /posthog|mixpanel|segment|amplitude|hotjar/i, // Analytics services
+                  /posthog|mixpanel|segment|amplitude|hotjar/i,
                   /cdn\.|assets\.|static\./i
                 ]
 
@@ -120,28 +162,19 @@ export async function POST(request: NextRequest) {
                 
                 // Enhanced API detection patterns
                 const isApiEndpoint = !isStaticAsset && (
-                  // Traditional API patterns
                   reqUrl.includes('/api/') ||
                   reqUrl.includes('/v1/') || reqUrl.includes('/v2/') || reqUrl.includes('/v3/') ||
                   reqUrl.match(/\/(api|rest|graphql|gql)\//i) ||
                   reqUrl.includes('.json') ||
-                  
-                  // Modern API patterns
                   contentType.includes('application/json') ||
                   contentType.includes('application/api') ||
                   contentType.includes('text/plain') && (method === 'POST' || method === 'PUT') ||
-                  
-                  // XHR/Fetch requests (often APIs)
                   (method !== 'GET' && !isStaticAsset) ||
-                  
-                  // Backend endpoints
                   reqUrl.match(/\/(auth|login|logout|user|users|data|config|settings)/i) ||
                   reqUrl.match(/\/(submit|upload|download|search|query)/i) ||
                   reqUrl.match(/\/(repos|repositories|gists|notifications|issues|pulls)/i) ||
                   reqUrl.match(/\/(orgs|organizations|teams|projects|actions)/i) ||
                   reqUrl.match(/\/(graphql|rest|api|_private|internal)/i) ||
-                  
-                  // Status codes that suggest API endpoints
                   [200, 201, 202, 400, 401, 403, 404, 422, 500, 502, 503].includes(status) && 
                   !reqUrl.includes('favicon') && 
                   !reqUrl.includes('robots.txt')
@@ -153,7 +186,6 @@ export async function POST(request: NextRequest) {
                   const logMessage = `${method} ${reqUrl} → ${status} (${contentType})`
                   sendSSE({ type: 'log', message: logMessage })
                   
-                  // Update progress based on requests found
                   requestCount++
                   progress = Math.min(10 + (requestCount * 2), maxProgress)
                   sendSSE({ type: 'progress', progress })
@@ -166,139 +198,130 @@ export async function POST(request: NextRequest) {
 
           sendSSE({ type: 'log', message: `Navigating to ${url}` })
           
-          // Navigate to the URL with more robust timeout handling
+          checkTimeout()
+
+          // Navigate to the URL with strict timeout
+          console.log('Navigating to page...')
           try {
-            await page.goto(url, { 
-              waitUntil: 'domcontentloaded', // Less strict than networkidle0
-              timeout: 45000 // Increased from 30s to 45s
-            })
+            await Promise.race([
+              page.goto(url, { 
+                waitUntil: 'domcontentloaded',
+                timeout: PAGE_LOAD_TIMEOUT
+              }),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Page navigation timeout')), PAGE_LOAD_TIMEOUT)
+              )
+            ])
             
-            // Wait for additional network requests to settle
-            try {
-              await page.waitForTimeout(3000) // Wait 3s for additional requests
-              await page.evaluate(() => new Promise(resolve => {
-                if (document.readyState === 'complete') resolve(null)
-                else window.addEventListener('load', () => resolve(null))
-              }))
-            } catch {
-              // If waiting fails, continue anyway
-              sendSSE({ type: 'log', message: 'Additional wait failed, continuing with analysis' })
-            }
+            // Brief wait for additional requests
+            await Promise.race([
+              page.waitForTimeout(2000),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Additional wait timeout')), 3000)
+              )
+            ])
           } catch (error) {
-            if (error.message.includes('timeout')) {
-              sendSSE({ type: 'log', message: 'Page load timeout, continuing with partial analysis' })
-            } else {
-              throw error
-            }
+            console.log('Page load error:', error.message)
+            sendSSE({ type: 'log', message: `Page load issue: ${error.message}, continuing with analysis` })
           }
 
           sendSSE({ type: 'log', message: 'Page loaded, analyzing network traffic' })
           sendSSE({ type: 'progress', progress: 50 })
 
-          // Trigger user interactions to discover more API endpoints
+          checkTimeout()
+
+          // Trigger user interactions with strict timeout
           sendSSE({ type: 'log', message: 'Simulating user interactions to discover APIs' })
           
           try {
-            // Scroll to trigger lazy loading
-            await page.evaluate(() => {
-              return new Promise((resolve) => {
-                let totalHeight = 0
-                const distance = 100
-                const timer = setInterval(() => {
-                  window.scrollBy(0, distance)
-                  totalHeight += distance
+            console.log('Starting user interactions...')
+            await Promise.race([
+              (async () => {
+                // Quick scroll to trigger lazy loading
+                await page.evaluate(() => {
+                  return new Promise((resolve) => {
+                    let totalHeight = 0
+                    const distance = 200 // Larger steps for faster scrolling
+                    const timer = setInterval(() => {
+                      window.scrollBy(0, distance)
+                      totalHeight += distance
+                      
+                      if(totalHeight >= Math.min(document.body.scrollHeight, 2000)) { // Limit scroll depth
+                        clearInterval(timer)
+                        resolve(null)
+                      }
+                    }, 50) // Faster scrolling
+                  })
+                })
+                
+                // Quick click on common interactive elements
+                const clickableSelectors = [
+                  'button', '.btn', '[role="button"]',
+                  '.nav-link', '.menu-item', 
+                  '.js-site-search-form', '.header-search-button'
+                ]
+                
+                for (const selector of clickableSelectors.slice(0, 3)) { // Limit selectors
+                  try {
+                    const elements = await page.$$(selector)
+                    if (elements.length > 0) {
+                      await elements[0].click({ delay: 50 })
+                      await page.waitForTimeout(300) // Shorter wait
+                    }
+                  } catch (err) {
+                    // Continue if clicking fails
+                  }
                   
-                  if(totalHeight >= document.body.scrollHeight) {
-                    clearInterval(timer)
-                    resolve(null)
-                  }
-                }, 100)
-              })
-            })
-            
-            // Click on common interactive elements
-            const clickableSelectors = [
-              'button', 'a[href="#"]', '[onclick]', '[role="button"]',
-              '.nav-link', '.menu-item', '.tab', '.dropdown-toggle',
-              '[data-toggle]', '[data-action]', '.btn',
-              // GitHub-specific selectors
-              '.js-site-search-form', '.js-global-search-toggle', 
-              '.header-search-button', '.octicon-search',
-              '.repo-list a', '.avatar', '.user-mention',
-              // More generic interactive elements
-              '[data-testid]', '[data-view-component]', '[data-action]',
-              'a[href*="/api"]', 'a[href*="/search"]', 'a[href*="/user"]'
-            ]
-            
-            for (const selector of clickableSelectors) {
-              try {
-                const elements = await page.$$(selector)
-                if (elements.length > 0) {
-                  // Click first few elements of each type
-                  for (let i = 0; i < Math.min(3, elements.length); i++) {
-                    await elements[i].click({ delay: 100 })
-                    await page.waitForTimeout(500) // Wait for potential API calls
-                  }
+                  checkTimeout() // Check timeout during interactions
                 }
-              } catch (err) {
-                // Continue if clicking fails
-              }
-            }
-            
-                         // Trigger form interactions and searches
-             try {
-               const forms = await page.$$('form')
-               for (const form of forms.slice(0, 3)) { // Increased to 3 forms
-                 const inputs = await form.$$('input[type="text"], input[type="search"], input[type="email"], textarea')
-                 for (const input of inputs.slice(0, 2)) {
-                   // Use more realistic test data that might trigger APIs
-                   const testInputs = ['react', 'javascript', 'python', 'test']
-                   const randomInput = testInputs[Math.floor(Math.random() * testInputs.length)]
-                   await input.type(randomInput, { delay: 50 })
-                   await page.waitForTimeout(500) // Wait longer for autocomplete/search APIs
-                   
-                   // Try pressing Enter to trigger search
-                   try {
-                     await input.press('Enter')
-                     await page.waitForTimeout(1000)
-                   } catch (err) {
-                     // Continue if Enter press fails
-                   }
-                 }
-               }
-               
-               // Try triggering search specifically
-               try {
-                 const searchInput = await page.$('input[type="search"], input[name*="search"], input[placeholder*="search"]')
-                 if (searchInput) {
-                   await searchInput.type('react', { delay: 100 })
-                   await page.waitForTimeout(800) // Wait for autocomplete APIs
-                 }
-               } catch (err) {
-                 // Continue if search fails
-               }
-               
-             } catch (err) {
-               // Continue if form interaction fails
-             }
-            
-          } catch (err) {
-            sendSSE({ type: 'log', message: 'User interaction simulation completed with some errors' })
+                
+                // Quick form interaction
+                try {
+                  const searchInput = await page.$('input[type="search"], input[name*="search"]')
+                  if (searchInput) {
+                    await searchInput.type('test', { delay: 50 })
+                    await page.waitForTimeout(500)
+                  }
+                } catch (err) {
+                  // Continue if search fails
+                }
+              })(),
+              new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('User interaction timeout')), INTERACTION_TIMEOUT)
+              )
+            ])
+          } catch (error) {
+            console.log('User interaction error:', error.message)
+            sendSSE({ type: 'log', message: `User interaction completed: ${error.message}` })
           }
           
           sendSSE({ type: 'progress', progress: 70 })
           
-          // Wait for any final API calls triggered by interactions
-          await new Promise(resolve => setTimeout(resolve, 3000))
+          checkTimeout()
+          
+          // Brief final wait for API calls
+          await Promise.race([
+            new Promise(resolve => setTimeout(resolve, 1500)),
+            new Promise((_, reject) => 
+              setTimeout(() => reject(new Error('Final wait timeout')), 2000)
+            )
+          ]).catch(() => {
+            // Continue if final wait times out
+          })
           
           sendSSE({ type: 'log', message: 'Processing discovered endpoints' })
           sendSSE({ type: 'progress', progress: 80 })
 
-          // Clean up
-          await browser.close()
-          await hb.sessions.stop(session.id)
+          // Clean up resources
+          console.log('Cleaning up resources...')
+          if (browser) {
+            await browser.close().catch(err => console.warn('Browser close error:', err))
+          }
+          if (session && hb) {
+            await hb.sessions.stop(session.id).catch(err => console.warn('Session stop error:', err))
+          }
           
-          // Dedupe and process endpoints
+          // Process results
           const uniqueEndpoints = dedupeEndpoints(endpoints)
           const postmanCollection = generatePostmanCollection(url, uniqueEndpoints)
           
@@ -320,11 +343,27 @@ export async function POST(request: NextRequest) {
         } catch (error) {
           console.error('Crawl error:', error)
           sendSSE({ 
-            type: 'log', 
+            type: 'error',
             message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` 
           })
+          
+          // Ensure cleanup on error
+          try {
+            if (browser) {
+              await browser.close().catch(err => console.warn('Error cleanup - browser close:', err))
+            }
+            if (session && hb) {
+              await hb.sessions.stop(session.id).catch(err => console.warn('Error cleanup - session stop:', err))
+            }
+          } catch (cleanupError) {
+            console.warn('Cleanup error:', cleanupError)
+          }
         } finally {
-          controller.close()
+          try {
+            controller.close()
+          } catch (closeError) {
+            console.warn('Controller close error:', closeError)
+          }
         }
       }
     })
@@ -342,9 +381,22 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('API error:', error)
+    
+    // Ensure cleanup on outer error
+    try {
+      if (browser) {
+        await browser.close().catch(err => console.warn('Outer error cleanup - browser close:', err))
+      }
+      if (session && hb) {
+        await hb.sessions.stop(session.id).catch(err => console.warn('Outer error cleanup - session stop:', err))
+      }
+    } catch (cleanupError) {
+      console.warn('Outer cleanup error:', cleanupError)
+    }
+    
     return new Response(
       error instanceof Error ? error.message : 'Internal server error',
       { status: 500 }
     )
   }
-} 
+}
