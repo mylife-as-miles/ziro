@@ -188,7 +188,7 @@ export default function CTASection() {
               <div className="text-gray-400 font-medium">Security Teams</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-yellow-400 mb-2">< 30s</div>
+              <div className="text-4xl font-bold text-yellow-400 mb-2">&lt; 30s</div>
               <div className="text-gray-400 font-medium">Average Discovery</div>
             </div>
           </div>
