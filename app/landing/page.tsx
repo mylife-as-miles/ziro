@@ -117,23 +117,23 @@ export default function LandingPage() {
       <div className="min-h-screen bg-black">
         <LandingNavbar />
 
-        <main className="container mx-auto px-4 py-8 max-w-2xl" style={{ paddingTop: '5rem' }}>
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center mb-6">
-              <h1 className="text-6xl font-bold text-white tracking-tight">
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl" style={{ paddingTop: '4rem sm:5rem' }}>
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="flex items-center justify-center mb-4 sm:mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
                 Deep<span style={{ color: '#F0FF26' }}>Crawler</span>
               </h1>
             </div>
-            <p className="text-lg text-gray-500 tracking-tight">
+            <p className="text-base sm:text-lg text-gray-500 tracking-tight px-4">
               Unlock Hidden APIs in Seconds with{' '}
               <span className="items-center">
-                <img src="/Yellow BG.png" alt="Hyperbrowser" className="inline h-5 w-auto rounded-full" />
+                <img src="/Yellow BG.png" alt="Hyperbrowser" className="inline h-4 sm:h-5 w-auto rounded-full" />
               </span>
             </p>
           </div>
 
           <div
-            className="relative rounded-2xl p-8 overflow-hidden"
+            className="relative rounded-2xl p-4 sm:p-6 lg:p-8 overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, rgba(240, 255, 38, 0.1) 0%, rgba(0, 0, 0, 0.8) 50%, rgba(240, 255, 38, 0.05) 100%)',
               border: '1px solid rgba(240, 255, 38, 0.2)'
@@ -144,7 +144,7 @@ export default function LandingPage() {
             <UrlForm onSubmit={handleCrawl} isLoading={isLoading} />
 
             {result && (
-              <div className="mt-8 animate-in fade-in duration-500">
+              <div className="mt-6 sm:mt-8 animate-in fade-in duration-500">
                 <ResultCard
                   endpointCount={result.endpoints.length}
                   crawlId={result.crawlId}
@@ -155,8 +155,8 @@ export default function LandingPage() {
           </div>
 
           {result && (
-            <div className="mt-8 text-center">
-              <p className="text-sm text-gray-500 font-medium tracking-tight">
+            <div className="mt-6 sm:mt-8 text-center px-4">
+              <p className="text-xs sm:text-sm text-gray-500 font-medium tracking-tight">
                 Powered by{' '}
                 <a
                   href="https://hyperbrowser.ai"
@@ -204,18 +204,18 @@ export default function LandingPage() {
       <CTASection />
       
       {/* Dashboard Section */}
-      <section id="dashboard" className="py-20 bg-gradient-to-b from-black to-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+      <section id="dashboard" className="py-16 sm:py-20 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
               Try Ziro Now
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl text-gray-400 max-w-2xl lg:max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
               Experience the power of AI-driven API discovery. Enter any URL and watch Ziro uncover hidden endpoints in real-time.
             </p>
             <button
               onClick={() => setShowDashboard(true)}
-              className="px-8 py-4 rounded-xl font-bold text-black transition-all duration-300 hover:scale-105"
+              className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-black transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               style={{
                 background: 'linear-gradient(135deg, #F0FF26 0%, #E0EF16 100%)',
                 boxShadow: '0 10px 40px rgba(240, 255, 38, 0.3)'
