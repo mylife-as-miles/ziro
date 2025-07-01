@@ -1,1 +1,1 @@
-# ziro
+#  Zir0 is an AI-powerered API discovery platform that crerates tools that creates undetectable browser sessions to surface hidden endpoints in seconds
