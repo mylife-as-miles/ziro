@@ -6,6 +6,13 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
+  experimental: {
+    forceSwcTransforms: false,
+  },
+  swcMinify: false,
+  compiler: {
+    removeConsole: false,
+  },
   async redirects() {
     return [
       {
