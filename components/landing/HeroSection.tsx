@@ -149,7 +149,7 @@ export default function HeroSection() {
               <div className="text-gray-400 font-medium">Undetected Rate</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-400 mb-2">< 30s</div>
+              <div className="text-3xl font-bold text-yellow-400 mb-2">&lt; 30s</div>
               <div className="text-gray-400 font-medium">Average Discovery</div>
             </div>
           </div>
