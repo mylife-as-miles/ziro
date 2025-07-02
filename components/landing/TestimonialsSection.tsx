@@ -107,17 +107,170 @@ export default function TestimonialsSection() {
   ]
 
   return (
-    <section id="testimonials" ref={sectionRef} className="py-20 bg-gradient-to-b from-gray-900 to-black">
-      <div className="container mx-auto px-4">
-        <div className={`text-center mb-16 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+    <section id="testimonials" ref={sectionRef} className="relative py-24 lg:py-32 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">
+      {/* Enhanced background effects */}
+      <div className="absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(240,255,38,0.1),transparent)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_80%,rgba(59,130,246,0.05),transparent)]" />
+        
+        {/* Floating quote marks */}
+        {[...Array(6)].map((_, i) => (
+          <Quote 
+            key={i}
+            className="absolute w-8 h-8 text-yellow-400/10 animate-float"
+            style={{
+              left: `${10 + i * 15}%`,
+              top: `${20 + (i % 2) * 40}%`,
+              animationDelay: `${i * 2}s`,
+              animationDuration: `${4 + i}s`
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Enhanced header */}
+        <div className={`text-center mb-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="inline-flex items-center space-x-2 mb-6">
+            <div className="flex space-x-1">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+              ))}
+            </div>
+            <span className="text-yellow-400 font-semibold">4.9/5 Average Rating</span>
+          </div>
+          
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
             Trusted by Security
             <br />
-            <span className="bg-gradient-to-r from-yellow-400 to-yellow-300 bg-clip-text text-transparent">
-              Professionals
+            <span className="bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+              Professionals Worldwide
             </span>
           </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+          
+          <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            See what industry experts are saying about Ziro's revolutionary approach to API discovery and security testing.
+          </p>
+        </div>
+
+        {/* Enhanced testimonials grid */}
+        <div className={`transition-all duration-1000 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => {
+              const isActive = activeTestimonial === index
+              
+              return (
+                <div
+                  key={index}
+                  className={`group relative p-8 rounded-3xl border transition-all duration-500 ${
+                    isActive 
+                      ? 'border-yellow-400/50 bg-gradient-to-br from-yellow-400/10 via-transparent to-transparent scale-105 shadow-2xl shadow-yellow-400/20' 
+                      : 'border-gray-800 bg-black/20 hover:border-gray-700 hover:bg-gray-900/30'
+                  }`}
+                  onClick={() => setActiveTestimonial(index)}
+                  style={{ animationDelay: `${index * 200}ms` }}
+                >
+                  {/* Quote decoration */}
+                  <div className={`absolute top-4 right-4 transition-all duration-300 ${
+                    isActive ? 'text-yellow-400 scale-110' : 'text-gray-600 group-hover:text-gray-500'
+                  }`}>
+                    <Quote className="w-8 h-8" />
+                  </div>
+
+                  {/* Rating */}
+                  <div className="flex items-center space-x-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className={`w-4 h-4 fill-current transition-colors duration-300 ${
+                        isActive ? 'text-yellow-400' : 'text-gray-400 group-hover:text-yellow-400'
+                      }`} />
+                    ))}
+                  </div>
+
+                  {/* Testimonial text */}
+                  <blockquote className={`text-lg leading-relaxed mb-6 transition-colors duration-300 ${
+                    isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                  }`}>
+                    "{testimonial.text}"
+                  </blockquote>
+
+                  {/* Highlight */}
+                  <div className={`inline-block px-3 py-1 rounded-full text-sm font-medium mb-6 transition-all duration-300 ${
+                    isActive 
+                      ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/30' 
+                      : 'bg-gray-800 text-gray-400 group-hover:bg-gray-700 group-hover:text-gray-300'
+                  }`}>
+                    💡 {testimonial.highlight}
+                  </div>
+
+                  {/* Author */}
+                  <div className="flex items-center space-x-4">
+                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center text-white font-bold transition-transform duration-300 group-hover:scale-110`}>
+                      {testimonial.avatar}
+                    </div>
+                    
+                    <div>
+                      <div className={`font-semibold transition-colors duration-300 ${
+                        isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
+                      }`}>
+                        {testimonial.name}
+                      </div>
+                      <div className={`text-sm transition-colors duration-300 ${
+                        isActive ? 'text-gray-400' : 'text-gray-500 group-hover:text-gray-400'
+                      }`}>
+                        {testimonial.role} at {testimonial.company}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active indicator */}
+                  {isActive && (
+                    <div className="absolute bottom-4 right-4">
+                      <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Navigation dots */}
+        <div className={`flex justify-center space-x-3 mt-12 transition-all duration-1000 delay-600 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                activeTestimonial === index 
+                  ? 'bg-yellow-400 scale-125' 
+                  : 'bg-gray-600 hover:bg-gray-500'
+              }`}
+              onClick={() => setActiveTestimonial(index)}
+            />
+          ))}
+        </div>
+
+        {/* Stats section */}
+        <div className={`mt-20 transition-all duration-1000 delay-900 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            {[
+              { value: "10,000+", label: "Security Professionals" },
+              { value: "4.9/5", label: "Average Rating" },
+              { value: "99.2%", label: "Customer Satisfaction" },
+              { value: "500+", label: "Enterprise Clients" }
+            ].map((stat, index) => (
+              <div key={index} className="text-center group">
+                <div className="text-3xl lg:text-4xl font-bold text-yellow-400 mb-2 group-hover:scale-110 transition-transform duration-300">
+                  {stat.value}
+                </div>
+                <div className="text-gray-400 group-hover:text-gray-300 transition-colors duration-300">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
             See what security teams around the world are saying about Ziro
           </p>
         </div>
