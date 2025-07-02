@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Zap, Shield, Target, Clock, Download, Users } from 'lucide-react'
+import { Zap, Shield, Target, Clock, Download, Users, TrendingUp, Award, Gauge, Brain } from 'lucide-react'
 
 export default function BenefitsSection() {
   const [isVisible, setIsVisible] = useState(false)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [activeMetric, setActiveMetric] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -22,32 +23,80 @@ export default function BenefitsSection() {
       observer.observe(sectionRef.current)
     }
 
-    return () => observer.disconnect()
+    // Auto-rotate metrics
+    const interval = setInterval(() => {
+      setActiveMetric(prev => (prev + 1) % 4)
+    }, 3000)
+
+    return () => {
+      observer.disconnect()
+      clearInterval(interval)
+    }
   }, [])
 
   const benefits = [
     {
-      icon: Zap,
-      title: "Lightning-Fast Discovery",
-      description: "Discover APIs in seconds, not weeks. Our AI-powered crawling technology maps entire applications instantly.",
+      icon: Brain,
+      title: "AI-Powered Discovery",
+      description: "Revolutionary machine learning algorithms that understand application behavior and discover hidden endpoints with unprecedented accuracy.",
       metric: "30x faster",
       detail: "than manual methods",
-      color: "yellow"
+      color: "from-blue-400 to-cyan-400",
+      bgColor: "bg-blue-500/10"
     },
     {
       icon: Shield,
-      title: "Undetectable Automation",
-      description: "Advanced stealth technology ensures your reconnaissance remains completely invisible to target systems.",
+      title: "Stealth Operations",
+      description: "Military-grade evasion techniques ensure complete invisibility while conducting comprehensive reconnaissance of target systems.",
       metric: "99.9% undetected",
       detail: "success rate",
-      color: "blue"
+      color: "from-green-400 to-emerald-400",
+      bgColor: "bg-green-500/10"
     },
     {
       icon: Target,
       title: "Precision Mapping",
-      description: "Comprehensive endpoint discovery with detailed analysis of parameters, responses, and authentication.",
+      description: "Complete API surface analysis with detailed parameter extraction, authentication detection, and comprehensive documentation generation.",
       metric: "100% coverage",
       detail: "of accessible endpoints",
+      color: "from-purple-400 to-pink-400",
+      bgColor: "bg-purple-500/10"
+    },
+    {
+      icon: Gauge,
+      title: "Real-Time Intelligence",
+      description: "Live monitoring and instant analysis provide immediate insights into API vulnerabilities and security gaps as they're discovered.",
+      metric: "< 15 seconds",
+      detail: "average discovery time",
+      color: "from-orange-400 to-red-400",
+      bgColor: "bg-orange-500/10"
+    },
+    {
+      icon: Download,
+      title: "Universal Export",
+      description: "Seamless integration with your existing workflow through multiple export formats including Postman, OpenAPI, and custom schemas.",
+      metric: "10+ formats",
+      detail: "supported",
+      color: "from-cyan-400 to-teal-400",
+      bgColor: "bg-cyan-500/10"
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Enterprise-grade collaboration features enable security teams to share discoveries, coordinate testing, and maintain comprehensive audits.",
+      metric: "Unlimited teams",
+      detail: "and shared workspaces",
+      color: "from-indigo-400 to-purple-400",
+      bgColor: "bg-indigo-500/10"
+    }
+  ]
+
+  const keyMetrics = [
+    { value: "47", label: "Avg. Endpoints Found", subtext: "per application scan" },
+    { value: "15s", label: "Discovery Time", subtext: "for most applications" },
+    { value: "99.9%", label: "Stealth Success", subtext: "undetected operations" },
+    { value: "10K+", label: "Security Pros", subtext: "trust Ziro daily" }
+  ]
       color: "green"
     },
     {
