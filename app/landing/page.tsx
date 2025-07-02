@@ -80,7 +80,7 @@ export default function LandingPage() {
         throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
-      reader = response.body?.getReader() || null
+      reader = response.body?.getReader()
       if (!reader) throw new Error('No response body')
 
       const decoder = new TextDecoder()
@@ -161,13 +161,13 @@ export default function LandingPage() {
           <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
             <div className="flex items-center justify-center mb-3 xs:mb-4 sm:mb-6">
               <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white tracking-tight">
-                Zir<span style={{ color: '#F0FF26' }}>0</span>
+                Deep<span style={{ color: '#F0FF26' }}>Crawler</span>
               </h1>
             </div>
             <p className="text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-500 tracking-tight px-2 xs:px-4">
               Unlock Hidden APIs in Seconds with{' '}
               <span className="items-center">
-                <img src="/Yellow BG.png" alt="Zir0" className="inline h-3 xs:h-4 sm:h-5 lg:h-6 xl:h-7 w-auto rounded-full" />
+                <img src="/Yellow BG.png" alt="Hyperbrowser" className="inline h-3 xs:h-4 sm:h-5 lg:h-6 xl:h-7 w-auto rounded-full" />
               </span>
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function LandingPage() {
               <p className="text-xs xs:text-xs sm:text-sm lg:text-base xl:text-lg text-gray-500 font-medium tracking-tight">
                 Powered by{' '}
                 <a
-                  href="https://zir0.ai"
+                  href="https://hyperbrowser.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white font-medium transition-colors"
@@ -220,7 +220,7 @@ export default function LandingPage() {
                 </a>
                 {' • '}
                 <a
-                  href="https://docs.zir0.ai"
+                  href="https://docs.hyperbrowser.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"

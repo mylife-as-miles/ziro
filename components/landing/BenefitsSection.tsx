@@ -97,6 +97,31 @@ export default function BenefitsSection() {
     { value: "99.9%", label: "Stealth Success", subtext: "undetected operations" },
     { value: "10K+", label: "Security Pros", subtext: "trust Ziro daily" }
   ]
+      color: "green"
+    },
+    {
+      icon: Clock,
+      title: "Real-Time Analysis",
+      description: "Live monitoring and instant results with detailed logs and progress tracking throughout the process.",
+      metric: "Real-time",
+      detail: "progress updates",
+      color: "purple"
+    },
+    {
+      icon: Download,
+      title: "Export Ready",
+      description: "Generate Postman collections, OpenAPI specs, and detailed reports ready for your security workflow.",
+      metric: "Multiple formats",
+      detail: "supported",
+      color: "orange"
+    },
+    {
+      icon: Users,
+      title: "Team Collaboration",
+      description: "Share discoveries with your team, integrate with existing tools, and maintain centralized documentation.",
+      metric: "Seamless",
+      detail: "team integration",
+      color: "pink"
   return (
     <section ref={sectionRef} className="relative py-24 lg:py-32 bg-black overflow-hidden">
       {/* Enhanced background effects */}

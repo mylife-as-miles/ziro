@@ -23,7 +23,7 @@ export default function Footer() {
             </p>
             <div className="flex space-x-3 sm:space-x-4">
               <a
-                href="https://github.com/zir0ai"
+                href="https://github.com/hyperbrowserai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
@@ -31,7 +31,7 @@ export default function Footer() {
                 <Github className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               </a>
               <a
-                href="https://twitter.com/zir0ai"
+                href="https://twitter.com/hyperbrowser"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
@@ -39,7 +39,7 @@ export default function Footer() {
                 <Twitter className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               </a>
               <a
-                href="https://linkedin.com/company/zir0ai"
+                href="https://linkedin.com/company/hyperbrowser"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
@@ -47,7 +47,7 @@ export default function Footer() {
                 <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
               </a>
               <a
-                href="mailto:support@zir0.ai"
+                href="mailto:support@hyperbrowser.ai"
                 className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors"
               >
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400" />
@@ -85,7 +85,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://docs.zir0.ai"
+                  href="https://docs.hyperbrowser.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-400 hover:text-white transition-colors flex items-center space-x-1 text-sm sm:text-base"
@@ -128,7 +128,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8">
           <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
             <div className="text-gray-400 text-xs sm:text-sm">
-              © {currentYear} Zir0. All rights reserved.
+              © {currentYear} Hyperbrowser AI. All rights reserved.
             </div>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm">
               <a href="#" className="text-gray-400 hover:text-white transition-colors text-center">

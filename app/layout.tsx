@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Zir0 - Uncover Hidden APIs",
+  title: "DeepCrawler - Uncover Hidden APIs",
   description: "Discover every API endpoint on any website in seconds with AI-powered crawling",
   keywords: "API discovery, web crawling, endpoint finder, API testing",
   authors: [{ name: "Hyperbrowser" }],

@@ -138,5 +138,39 @@ export default function TrustLogos() {
         </div>
       </div>
     </section>
+              >
+                <div className="text-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 rounded-lg bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center text-white font-bold text-sm sm:text-lg group-hover:from-yellow-400/20 group-hover:to-yellow-500/20 transition-all duration-300">
+                    {company.logo}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-500 group-hover:text-gray-400 transition-colors">
+                    {company.name}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={`text-center mt-8 sm:mt-12 transition-all duration-1000 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-gray-400">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-xs sm:text-sm font-medium">SOC 2 Compliant</span>
+            </div>
+            <div className="hidden sm:block w-1 h-4 bg-gray-700" />
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+              <span className="text-xs sm:text-sm font-medium">GDPR Ready</span>
+            </div>
+            <div className="hidden sm:block w-1 h-4 bg-gray-700" />
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+              <span className="text-xs sm:text-sm font-medium">Enterprise Grade</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }

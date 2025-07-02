@@ -28,12 +28,12 @@ export function dedupeEndpoints(endpoints: ApiEndpoint[]): ApiEndpoint[] {
 
 export function generatePostmanCollection(originalUrl: string, endpoints: ApiEndpoint[]) {
   const hostname = new URL(originalUrl).hostname
-  const collectionName = `Zir0 - ${hostname}`
+  const collectionName = `DeepCrawler - ${hostname}`
 
   const collection = {
     info: {
       name: collectionName,
-      description: `API endpoints discovered by Zir0 from ${originalUrl}`,
+      description: `API endpoints discovered by DeepCrawler from ${originalUrl}`,
       schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
     },
     item: endpoints.map((endpoint, index) => {
@@ -55,7 +55,7 @@ export function generatePostmanCollection(originalUrl: string, endpoints: ApiEnd
             },
             {
               key: 'User-Agent',
-              value: 'Zir0/1.0',
+              value: 'DeepCrawler/1.0',
               type: 'text'
             }
           ],
