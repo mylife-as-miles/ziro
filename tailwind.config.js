@@ -46,6 +46,21 @@ module.exports = {
       backdropBlur: {
         md: '12px',
       },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
+        '128': '32rem',
+        '144': '36rem',
+      },
+      maxWidth: {
+        '8xl': '88rem',
+        '9xl': '96rem',
+      },
+      fontSize: {
+        '10xl': '10rem',
+        '11xl': '12rem',
+        '12xl': '14rem',
+      },
     },
   },
   plugins: [],

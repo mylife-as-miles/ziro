@@ -85,4 +85,73 @@ a:focus-visible {
   border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
+/* Responsive utilities */
+@media (max-width: 374px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
 
+@media (min-width: 375px) and (max-width: 639px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1800px;
+  }
+}
+
+@media (min-width: 2560px) {
+  .container {
+    max-width: 2400px;
+  }
+}
+
+/* Ultra-wide screen adjustments */
+@media (min-width: 3840px) {
+  .container {
+    max-width: 3600px;
+  }
+  
+  html {
+    font-size: 18px;
+  }
+}
+
+/* High DPI screen adjustments */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-card {
+    backdrop-filter: blur(16px);
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 767px) {
+  button, .button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
