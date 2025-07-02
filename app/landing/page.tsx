@@ -157,23 +157,23 @@ export default function LandingPage() {
       <div className="min-h-screen bg-black">
         <LandingNavbar />
 
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl" style={{ paddingTop: '4rem sm:5rem' }}>
-          <div className="text-center mb-8 sm:mb-12">
-            <div className="flex items-center justify-center mb-4 sm:mb-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
+        <main className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 xs:py-6 sm:py-8 lg:py-12 max-w-xs xs:max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-4xl 2xl:max-w-5xl" style={{ paddingTop: '3rem xs:3.5rem sm:4rem lg:5rem xl:6rem' }}>
+          <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16">
+            <div className="flex items-center justify-center mb-3 xs:mb-4 sm:mb-6">
+              <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-bold text-white tracking-tight">
                 Deep<span style={{ color: '#F0FF26' }}>Crawler</span>
               </h1>
             </div>
-            <p className="text-base sm:text-lg text-gray-500 tracking-tight px-4">
+            <p className="text-sm xs:text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-500 tracking-tight px-2 xs:px-4">
               Unlock Hidden APIs in Seconds with{' '}
               <span className="items-center">
-                <img src="/Yellow BG.png" alt="Hyperbrowser" className="inline h-4 sm:h-5 w-auto rounded-full" />
+                <img src="/Yellow BG.png" alt="Hyperbrowser" className="inline h-3 xs:h-4 sm:h-5 lg:h-6 xl:h-7 w-auto rounded-full" />
               </span>
             </p>
           </div>
 
           <div
-            className="relative rounded-2xl p-4 sm:p-6 lg:p-8 overflow-hidden"
+            className="relative rounded-xl xs:rounded-2xl lg:rounded-3xl p-3 xs:p-4 sm:p-6 lg:p-8 xl:p-10 2xl:p-12 overflow-hidden"
             style={{
               background: 'linear-gradient(135deg, rgba(240, 255, 38, 0.1) 0%, rgba(0, 0, 0, 0.8) 50%, rgba(240, 255, 38, 0.05) 100%)',
               border: '1px solid rgba(240, 255, 38, 0.2)'
@@ -184,19 +184,19 @@ export default function LandingPage() {
             <UrlForm onSubmit={handleCrawl} isLoading={isLoading} />
 
             {error && (
-              <div className="mt-6 sm:mt-8 p-4 rounded-lg bg-red-900/20 border border-red-500/30">
+              <div className="mt-4 xs:mt-6 sm:mt-8 p-3 xs:p-4 rounded-lg xs:rounded-xl bg-red-900/20 border border-red-500/30">
                 <div className="flex items-center space-x-2">
                   <span className="text-red-400">⚠️</span>
-                  <p className="text-red-300 text-sm">{error}</p>
+                  <p className="text-red-300 text-xs xs:text-sm lg:text-base">{error}</p>
                 </div>
-                <p className="text-red-400/70 text-xs mt-2">
+                <p className="text-red-400/70 text-xs lg:text-sm mt-2">
                   This may be due to server timeout or resource limits. Try again with a simpler website.
                 </p>
               </div>
             )}
 
             {result && (
-              <div className="mt-6 sm:mt-8 animate-in fade-in duration-500">
+              <div className="mt-4 xs:mt-6 sm:mt-8 animate-in fade-in duration-500">
                 <ResultCard
                   endpointCount={result.endpoints.length}
                   crawlId={result.crawlId}
@@ -207,8 +207,8 @@ export default function LandingPage() {
           </div>
 
           {result && (
-            <div className="mt-6 sm:mt-8 text-center px-4">
-              <p className="text-xs sm:text-sm text-gray-500 font-medium tracking-tight">
+            <div className="mt-4 xs:mt-6 sm:mt-8 text-center px-2 xs:px-4">
+              <p className="text-xs xs:text-xs sm:text-sm lg:text-base xl:text-lg text-gray-500 font-medium tracking-tight">
                 Powered by{' '}
                 <a
                   href="https://hyperbrowser.ai"

@@ -9,7 +9,7 @@ export default function ProgressBar({ progress, isLoading }: ProgressBarProps) {
   if (!isLoading && progress === 0) return null
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-1 bg-gray-800 rounded-t-2xl overflow-hidden">
+    <div className="absolute top-0 left-0 right-0 h-0.5 xs:h-1 sm:h-1 lg:h-1.5 xl:h-2 bg-gray-800 rounded-t-xl xs:rounded-t-2xl lg:rounded-t-3xl overflow-hidden">
       <div 
         className="h-full transition-all duration-300 ease-out"
         style={{ 
