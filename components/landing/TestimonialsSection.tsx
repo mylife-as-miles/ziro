@@ -40,14 +40,40 @@ export default function TestimonialsSection() {
       avatar: "SC",
       rating: 5,
       text: "Ziro discovered 47 undocumented API endpoints in our main application that our manual testing missed. The stealth mode is incredible - completely undetected by our WAF.",
-      highlight: "47 undocumented endpoints discovered"
+      highlight: "47 undocumented endpoints discovered",
+      gradient: "from-blue-400 to-cyan-400"
     },
     {
       name: "Marcus Rodriguez",
-      role: "Penetration Tester",
+      role: "Penetration Tester", 
       company: "SecureNet",
       avatar: "MR",
       rating: 5,
+      text: "As a pen tester, I've tried every API discovery tool out there. Ziro's AI-powered approach finds endpoints that others simply can't. It's become essential to my workflow.",
+      highlight: "Essential to my workflow",
+      gradient: "from-green-400 to-emerald-400"
+    },
+    {
+      name: "Dr. Emily Watson",
+      role: "CISO",
+      company: "DataFlow Systems",
+      avatar: "EW",
+      rating: 5,
+      text: "Ziro helped us identify critical security gaps in our API infrastructure. The detailed reports and Postman integration saved our team weeks of manual work.",
+      highlight: "Weeks of manual work saved",
+      gradient: "from-purple-400 to-pink-400"
+    },
+    {
+      name: "Alex Kumar",
+      role: "DevSecOps Lead",
+      company: "CloudBase",
+      avatar: "AK", 
+      rating: 5,
+      text: "The real-time discovery capabilities are game-changing. We integrated Ziro into our CI/CD pipeline and now catch API vulnerabilities before they reach production.",
+      highlight: "Game-changing capabilities",
+      gradient: "from-orange-400 to-red-400"
+    }
+  ]
       text: "This tool has revolutionized our API discovery process. What used to take weeks now takes minutes. The Postman integration saves us hours of manual work.",
       highlight: "Weeks to minutes discovery time"
     },
