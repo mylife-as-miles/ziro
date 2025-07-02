@@ -12,15 +12,6 @@ const nextConfig = {
     // Optimize package imports for better performance
     optimizePackageImports: ['lucide-react'],
   },
-  async redirects() {
-    return [
-      {
-        source: '/login',
-        destination: '/landing',
-        permanent: true,
-      },
-    ]
-  },
 }
 
 export default nextConfig
