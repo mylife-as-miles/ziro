@@ -242,44 +242,140 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <LandingNavbar />
-      <HeroSection />
-      <TrustLogos />
-      <LossAversionSection />
-      <BenefitsSection />
-      <ProcessSection />
-      <FeaturesSection />
-      <PricingSection />
-      <TestimonialsSection />
-      <FAQSection />
-      <CTASection />
-      
-      {/* Dashboard Section */}
-      <section id="dashboard" className="py-12 xs:py-16 sm:py-20 lg:py-24 xl:py-32 2xl:py-40 bg-gradient-to-b from-black to-gray-900">
-        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 3xl:px-20">
-          <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16 xl:mb-20">
-            <h2 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl font-bold text-white mb-3 xs:mb-4 sm:mb-6 lg:mb-8">
-              Try Ziro Now
-            </h2>
-            <p className="text-base xs:text-lg sm:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl text-gray-400 max-w-lg xs:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto mb-4 xs:mb-6 sm:mb-8 lg:mb-12 px-2 xs:px-4">
-              Experience the power of AI-driven API discovery. Enter any URL and watch Ziro uncover hidden endpoints in real-time.
-            </p>
-            <button
-              onClick={() => setShowDashboard(true)}
-              className="px-4 xs:px-6 sm:px-8 lg:px-10 xl:px-12 2xl:px-16 py-2.5 xs:py-3 sm:py-4 lg:py-5 xl:py-6 2xl:py-8 rounded-lg xs:rounded-xl sm:rounded-xl lg:rounded-2xl font-bold text-black transition-all duration-300 hover:scale-105 text-sm xs:text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
-              style={{
-                background: 'linear-gradient(135deg, #F0FF26 0%, #E0EF16 100%)',
-                boxShadow: '0 10px 40px rgba(240, 255, 38, 0.3)'
-              }}
-            >
-              Launch Dashboard
-            </button>
+    <div className="min-h-screen bg-black text-white overflow-hidden">
+      {/* Animated background particles */}
+      <div className="fixed inset-0 z-0">
+        {[...Array(50)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-yellow-400/20 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10">
+        <LandingNavbar />
+        <HeroSection />
+        
+        {/* Enhanced sections with modern styling */}
+        <div className="relative">
+          {/* Gradient divider */}
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent" />
+          
+          <TrustLogos />
+          
+          {/* Modern section separator */}
+          <div className="flex justify-center py-8">
+            <div className="w-12 h-px bg-gradient-to-r from-yellow-400/50 to-yellow-600/50" />
           </div>
+          
+          <LossAversionSection />
+          <BenefitsSection />
+          
+          {/* Floating section divider */}
+          <div className="relative py-16">
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-gray-900/50 to-black" />
+            <div className="relative z-10 flex justify-center">
+              <div className="w-32 h-px bg-gradient-to-r from-transparent via-yellow-400 to-transparent" />
+            </div>
+          </div>
+          
+          <ProcessSection />
+          <FeaturesSection />
+          
+          {/* Enhanced pricing section backdrop */}
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-black via-gray-900/30 to-black" />
+            <div className="relative z-10">
+              <PricingSection />
+            </div>
+          </div>
+          
+          <TestimonialsSection />
+          <FAQSection />
+          <CTASection />
         </div>
-      </section>
-      
-      <Footer />
+        
+        {/* Enhanced Dashboard Section */}
+        <section id="dashboard" className="relative py-20 lg:py-32 bg-gradient-to-b from-black via-gray-900/50 to-black overflow-hidden">
+          {/* Advanced background effects */}
+          <div className="absolute inset-0">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(240,255,38,0.1)_0%,transparent_50%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(240,255,38,0.15),transparent)]" />
+          </div>
+          
+          {/* Animated grid overlay */}
+          <div 
+            className="absolute inset-0 opacity-10"
+            style={{
+              backgroundImage: `
+                linear-gradient(rgba(240, 255, 38, 0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(240, 255, 38, 0.3) 1px, transparent 1px)
+              `,
+              backgroundSize: '50px 50px',
+              animation: 'gridFloat 20s ease-in-out infinite'
+            }}
+          />
+          
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-16">
+              {/* Enhanced heading with gradient and glow */}
+              <div className="inline-block relative mb-6">
+                <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold bg-gradient-to-r from-white via-yellow-100 to-white bg-clip-text text-transparent leading-tight">
+                  Experience Ziro
+                </h2>
+                <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400/20 to-transparent blur-lg rounded-lg -z-10" />
+              </div>
+              
+              {/* Enhanced subtitle */}
+              <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto mb-8 leading-relaxed">
+                See the future of API discovery in action. Watch as Ziro's AI uncaps hidden endpoints 
+                and generates comprehensive documentation in real-time.
+              </p>
+              
+              {/* Enhanced CTA button with advanced effects */}
+              <div className="relative inline-block group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse" />
+                <button
+                  onClick={() => setShowDashboard(true)}
+                  className="relative px-8 py-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-black font-bold rounded-xl leading-none flex items-center space-x-3 transition-all duration-300 hover:scale-105 text-lg group"
+                >
+                  <span>Launch Interactive Demo</span>
+                  <div className="w-2 h-2 bg-black rounded-full animate-ping" />
+                  <svg className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              
+              {/* Real-time stats display */}
+              <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+                <div className="text-center p-4 rounded-xl bg-black/20 border border-yellow-400/20 backdrop-blur-sm">
+                  <div className="text-2xl font-bold text-yellow-400 mb-1">Live</div>
+                  <div className="text-sm text-gray-400">Ready to Scan</div>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-black/20 border border-yellow-400/20 backdrop-blur-sm">
+                  <div className="text-2xl font-bold text-yellow-400 mb-1">~15s</div>
+                  <div className="text-sm text-gray-400">Avg. Discovery</div>
+                </div>
+                <div className="text-center p-4 rounded-xl bg-black/20 border border-yellow-400/20 backdrop-blur-sm">
+                  <div className="text-2xl font-bold text-yellow-400 mb-1">AI-Powered</div>
+                  <div className="text-sm text-gray-400">Intelligence</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <Footer />
+      </div>
     </div>
   )
 }
