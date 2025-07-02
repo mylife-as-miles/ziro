@@ -47,7 +47,7 @@ export default function UrlForm({ onSubmit, isLoading }: UrlFormProps) {
           type="text"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://hyperbrowser.ai"
+          placeholder="https://zir0.ai"
           className="w-full px-3 xs:px-3 sm:px-4 lg:px-5 xl:px-6 2xl:px-8 py-2.5 xs:py-3 sm:py-4 lg:py-5 xl:py-6 2xl:py-8 pr-8 xs:pr-10 sm:pr-12 lg:pr-14 xl:pr-16 rounded-lg xs:rounded-xl sm:rounded-xl lg:rounded-2xl border border-gray-700/50 bg-black/30 backdrop-blur-sm placeholder-gray-500 text-gray-200 focus:outline-none transition-all font-regular tracking-tight text-xs xs:text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
           onFocus={(e) => {
             e.target.style.borderColor = '#F0FF26'

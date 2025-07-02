@@ -80,7 +80,7 @@ export default function LandingPage() {
         throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
-      reader = response.body?.getReader()
+      reader = response.body?.getReader() || null
       if (!reader) throw new Error('No response body')
 
       const decoder = new TextDecoder()
@@ -211,7 +211,7 @@ export default function LandingPage() {
               <p className="text-xs xs:text-xs sm:text-sm lg:text-base xl:text-lg text-gray-500 font-medium tracking-tight">
                 Powered by{' '}
                 <a
-                  href="https://hyperbrowser.ai"
+                  href="https://zir0.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white font-medium transition-colors"
@@ -220,7 +220,7 @@ export default function LandingPage() {
                 </a>
                 {' • '}
                 <a
-                  href="https://docs.hyperbrowser.ai"
+                  href="https://docs.zir0.ai"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-300 hover:text-white transition-colors"

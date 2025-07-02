@@ -23,7 +23,7 @@ export default function ResultCard({ endpointCount, crawlId, postmanCollection }
     // Generate a safe filename from the collection name
     const collectionName = postmanCollection.info?.name || 'collection'
     const safeName = collectionName.replace(/[^a-zA-Z0-9.-]/g, '-').toLowerCase()
-    a.download = `deepcrawler-${safeName}.json`
+    a.download = `zir0-${safeName}.json`
 
     document.body.appendChild(a)
     a.click()
@@ -102,10 +102,10 @@ export default function ResultCard({ endpointCount, crawlId, postmanCollection }
 
         <div className="pt-3 xs:pt-4 sm:pt-6 lg:pt-8 border-t border-gray-700/50">
           <p className="text-xs xs:text-xs sm:text-sm lg:text-base xl:text-lg text-gray-500 mb-2 xs:mb-3 sm:mb-4 lg:mb-5 font-medium tracking-tight uppercase">
-            POWERED BY HYPERBROWSER AI
+            POWERED BY ZIR0
           </p>
           <a
-            href="https://docs.hyperbrowser.ai"
+            href="https://docs.zir0.ai"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center space-x-2 lg:space-x-3 text-gray-300 hover:text-white font-medium text-xs xs:text-xs sm:text-sm lg:text-base xl:text-lg transition-colors tracking-tight"

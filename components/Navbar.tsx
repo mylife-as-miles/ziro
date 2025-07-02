@@ -9,16 +9,16 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img src="/hb.svg" alt="Hyperbrowser" className="w-6 h-6" />
+            <img src="/hb.svg" alt="Zir0" className="w-6 h-6" />
             <span className="text-xl font-bold text-white tracking-tight4">
-              deep<span style={{ color: '#F0FF26' }}>crawler</span>
+              Zir<span style={{ color: '#F0FF26' }}>0</span>
             </span>
           </div>
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
             <a
-              href="https://docs.hyperbrowser.ai"
+              href="https://docs.zir0.ai"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-colors font-medium tracking-tight4"
@@ -27,7 +27,7 @@ export default function Navbar() {
               <span>Docs</span>
             </a>
             <a
-              href="https://github.com/hyperbrowserai"
+              href="https://github.com/zir0ai"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 text-gray-400 hover:text-gray-200 transition-colors font-medium tracking-tight4"
@@ -36,7 +36,7 @@ export default function Navbar() {
               <span>GitHub</span>
             </a>
             <a
-              href="https://hyperbrowser.ai"
+              href="https://zir0.ai"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center space-x-2 px-4 py-2 rounded-lg transition-colors tracking-tight4 font-medium"
@@ -53,7 +53,7 @@ export default function Navbar() {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <a
-              href="https://hyperbrowser.ai"
+              href="https://zir0.ai"
               target="_blank"
               rel="noopener noreferrer"
               className="px-3 py-2 rounded-lg text-sm transition-colors tracking-tight4 font-medium"

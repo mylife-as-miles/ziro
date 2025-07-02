@@ -59,7 +59,7 @@ export default function LandingNavbar() {
               ))}
               
               <a
-                href="https://docs.hyperbrowser.ai"
+                href="https://docs.zir0.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors font-medium text-base lg:text-lg group"
@@ -70,7 +70,7 @@ export default function LandingNavbar() {
               </a>
               
               <a
-                href="https://github.com/hyperbrowserai"
+                href="https://github.com/zir0ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors font-medium text-base lg:text-lg group"
@@ -123,7 +123,7 @@ export default function LandingNavbar() {
               ))}
               
               <a
-                href="https://docs.hyperbrowser.ai"
+                href="https://docs.zir0.ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors font-medium py-3 px-3 hover:bg-gray-900/30 rounded-lg"
@@ -134,7 +134,7 @@ export default function LandingNavbar() {
               </a>
               
               <a
-                href="https://github.com/hyperbrowserai"
+                href="https://github.com/zir0ai"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors font-medium py-3 px-3 hover:bg-gray-900/30 rounded-lg"
