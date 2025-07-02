@@ -256,18 +256,18 @@ export default function LandingPage() {
       <CTASection />
       
       {/* Dashboard Section */}
-      <section id="dashboard" className="py-16 sm:py-20 bg-gradient-to-b from-black to-gray-900">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
+      <section id="dashboard" className="py-12 xs:py-16 sm:py-20 lg:py-24 xl:py-32 2xl:py-40 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 3xl:px-20">
+          <div className="text-center mb-6 xs:mb-8 sm:mb-12 lg:mb-16 xl:mb-20">
+            <h2 className="text-2xl xs:text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl font-bold text-white mb-3 xs:mb-4 sm:mb-6 lg:mb-8">
               Try Ziro Now
             </h2>
-            <p className="text-lg sm:text-xl text-gray-400 max-w-2xl lg:max-w-3xl mx-auto mb-6 sm:mb-8 px-4">
+            <p className="text-base xs:text-lg sm:text-xl lg:text-2xl xl:text-3xl 2xl:text-4xl text-gray-400 max-w-lg xs:max-w-2xl lg:max-w-4xl xl:max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto mb-4 xs:mb-6 sm:mb-8 lg:mb-12 px-2 xs:px-4">
               Experience the power of AI-driven API discovery. Enter any URL and watch Ziro uncover hidden endpoints in real-time.
             </p>
             <button
               onClick={() => setShowDashboard(true)}
-              className="px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-black transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+              className="px-4 xs:px-6 sm:px-8 lg:px-10 xl:px-12 2xl:px-16 py-2.5 xs:py-3 sm:py-4 lg:py-5 xl:py-6 2xl:py-8 rounded-lg xs:rounded-xl sm:rounded-xl lg:rounded-2xl font-bold text-black transition-all duration-300 hover:scale-105 text-sm xs:text-sm sm:text-base lg:text-lg xl:text-xl 2xl:text-2xl"
               style={{
                 background: 'linear-gradient(135deg, #F0FF26 0%, #E0EF16 100%)',
                 boxShadow: '0 10px 40px rgba(240, 255, 38, 0.3)'

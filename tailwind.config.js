@@ -6,6 +6,16 @@ module.exports = {
     './app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    screens: {
+      'xs': '375px',    // Extra small devices (small phones)
+      'sm': '640px',    // Small devices (phones)
+      'md': '768px',    // Medium devices (tablets)
+      'lg': '1024px',   // Large devices (desktops)
+      'xl': '1280px',   // Extra large devices (large desktops)
+      '2xl': '1536px',  // 2X Extra large devices (larger desktops)
+      '3xl': '1920px',  // Ultra wide screens
+      '4xl': '2560px',  // 4K and ultra-wide monitors
+    },
     extend: {
       colors: {
         accent: '#F0FF26',
