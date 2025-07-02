@@ -6,10 +6,10 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: false,
   },
-  // Modern Next.js has much better SWC stability
+  // Modern Next.js has excellent SWC stability
   swcMinify: true,
   experimental: {
-    // Remove deprecated options that cause issues
+    // Optimize package imports for better performance
     optimizePackageImports: ['lucide-react'],
   },
   async redirects() {
@@ -23,4 +23,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+export default nextConfig
