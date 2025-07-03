@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
           checkTimeout()
 
           // Set up request monitoring with error handling
-          page.on('requestfinished', (request) => {
+          page.on('requestfinished', (request: any) => {
             try {
               const response = request.response()
               if (response) {
@@ -220,9 +220,9 @@ export async function POST(request: NextRequest) {
                 setTimeout(() => reject(new Error('Additional wait timeout')), 3000)
               )
             ])
-          } catch (error) {
-            console.log('Page load error:', error.message)
-            sendSSE({ type: 'log', message: `Page load issue: ${error.message}, continuing with analysis` })
+          } catch (error: unknown) {
+            console.log('Page load error:', (error as Error).message)
+            sendSSE({ type: 'log', message: `Page load issue: ${(error as Error).message}, continuing with analysis` })
           }
 
           sendSSE({ type: 'log', message: 'Page loaded, analyzing network traffic' })
@@ -290,9 +290,9 @@ export async function POST(request: NextRequest) {
                 setTimeout(() => reject(new Error('User interaction timeout')), INTERACTION_TIMEOUT)
               )
             ])
-          } catch (error) {
-            console.log('User interaction error:', error.message)
-            sendSSE({ type: 'log', message: `User interaction completed: ${error.message}` })
+          } catch (error: unknown) {
+            console.log('User interaction error:', (error as Error).message)
+            sendSSE({ type: 'log', message: `User interaction completed: ${(error as Error).message}` })
           }
           
           sendSSE({ type: 'progress', progress: 70 })
@@ -315,10 +315,10 @@ export async function POST(request: NextRequest) {
           // Clean up resources
           console.log('Cleaning up resources...')
           if (browser) {
-            await browser.close().catch(err => console.warn('Browser close error:', err))
+            await browser.close().catch((err: any) => console.warn('Browser close error:', err))
           }
           if (session && hb) {
-            await hb.sessions.stop(session.id).catch(err => console.warn('Session stop error:', err))
+            await hb.sessions.stop(session.id).catch((err: any) => console.warn('Session stop error:', err))
           }
           
           // Process results
@@ -350,10 +350,10 @@ export async function POST(request: NextRequest) {
           // Ensure cleanup on error
           try {
             if (browser) {
-              await browser.close().catch(err => console.warn('Error cleanup - browser close:', err))
+              await browser.close().catch((err: any) => console.warn('Error cleanup - browser close:', err))
             }
             if (session && hb) {
-              await hb.sessions.stop(session.id).catch(err => console.warn('Error cleanup - session stop:', err))
+              await hb.sessions.stop(session.id).catch((err: any) => console.warn('Error cleanup - session stop:', err))
             }
           } catch (cleanupError) {
             console.warn('Cleanup error:', cleanupError)
@@ -385,10 +385,10 @@ export async function POST(request: NextRequest) {
     // Ensure cleanup on outer error
     try {
       if (browser) {
-        await browser.close().catch(err => console.warn('Outer error cleanup - browser close:', err))
+        await browser.close().catch((err: any) => console.warn('Outer error cleanup - browser close:', err))
       }
       if (session && hb) {
-        await hb.sessions.stop(session.id).catch(err => console.warn('Outer error cleanup - session stop:', err))
+        await hb.sessions.stop(session.id).catch((err: any) => console.warn('Outer error cleanup - session stop:', err))
       }
     } catch (cleanupError) {
       console.warn('Outer cleanup error:', cleanupError)

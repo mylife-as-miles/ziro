@@ -80,7 +80,7 @@ export default function LandingPage() {
         throw new Error(`HTTP ${response.status}: ${errorText}`)
       }
 
-      reader = response.body?.getReader()
+      reader = response.body?.getReader() || null
       if (!reader) throw new Error('No response body')
 
       const decoder = new TextDecoder()
