@@ -6,7 +6,8 @@ import {
   CheckCircle, AlertCircle, ArrowRight, Download, Copy, 
   ExternalLink, Play, Pause, RefreshCw, Eye, EyeOff,
   Terminal, Code, Database, Globe, Cpu, Settings,
-  TrendingUp, Award, Users, Layers, Monitor, Network
+  TrendingUp, Award, Users, Layers, Monitor, Network,
+  FileText
 } from 'lucide-react';
 
 interface ApiEndpoint {
@@ -255,7 +256,7 @@ export default function EnhancedDashboard({
 
     setInternalResult(mockResult);
     setInternalLoading(false);
-    setInternalLogs(prev => [...prev, `🎉 Advanced discovery complete! Found ${mockEndpoints.length} endpoints with ${mockResult.metadata.securityScore}% security score`]);
+    setInternalLogs(prev => [...prev, `🎉 Advanced discovery complete! Found ${mockEndpoints.length} endpoints with ${mockResult.metadata?.securityScore || 0}% security score`]);
   };
 
   const handleCrawl = async () => {
@@ -308,7 +309,7 @@ export default function EnhancedDashboard({
     return methodMatch && securityMatch;
   }) || [];
 
-  const uniqueMethods = [...new Set(result?.endpoints.map(ep => ep.method) || [])];
+  const uniqueMethods = Array.from(new Set(result?.endpoints.map(ep => ep.method) || []));
 
   return (
     <div className={`bg-black min-h-screen text-white ${className}`}>
@@ -947,7 +948,7 @@ export default function EnhancedDashboard({
                           <div className="text-gray-400 mb-2">// Example: Integrate with your CI/CD pipeline</div>
                           <div className="text-green-400">curl -X POST https://api.ziro.dev/v1/discover \</div>
                           <div className="text-blue-400 ml-4">-H "Authorization: Bearer YOUR_API_KEY" \</div>
-                          <div className="text-yellow-400 ml-4">-d '{"target": "https://api.example.com"}'</div>
+                          <div className="text-yellow-400 ml-4">-d '{`{"target": "https://api.example.com"}`}'</div>
                         </div>
                       </div>
                     </div>
@@ -1073,7 +1074,7 @@ export default function EnhancedDashboard({
                       <span className={`capitalize font-bold ${getSecurityColor(selectedEndpoint.security)}`}>
                         {selectedEndpoint.security}
                       </span>
-                      <span className={getSecurityColor(selectedEndpoint.security)} className="text-lg">
+                      <span className={`${getSecurityColor(selectedEndpoint.security)} text-lg`}>
                         {selectedEndpoint.security === 'secure' ? '🔒' : 
                          selectedEndpoint.security === 'warning' ? '⚠️' : 
                          selectedEndpoint.security === 'critical' ? '🚨' : '❓'}
