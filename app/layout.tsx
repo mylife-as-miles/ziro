@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import TwentyFirstToolbarWrapper from "../components/TwentyFirstToolbarWrapper";
 
 export const metadata: Metadata = {
   title: "DeepCrawler - Uncover Hidden APIs",
@@ -39,7 +38,6 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/hb.svg" />
       </head>
       <body className="min-h-screen bg-black text-white">
-        <TwentyFirstToolbarWrapper />
         {children}
       </body>
     </html>
