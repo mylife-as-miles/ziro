@@ -8,30 +8,6 @@ export default function TestimonialsSection() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial(prev => (prev + 1) % testimonials.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [testimonials.length])
-
   const testimonials = [
     {
       name: "Sarah Chen",
@@ -104,6 +80,30 @@ export default function TestimonialsSection() {
       gradient: "from-rose-400 to-pink-400"
     }
   ]
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [testimonials.length])
 
   return (
     <section id="testimonials" ref={sectionRef} className="relative py-24 lg:py-32 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">

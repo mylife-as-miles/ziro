@@ -27,10 +27,6 @@ type PlannedAction =
   | { action: 'type'; selector: string; text: string; reason: string; submitWithEnter?: boolean }
   | { action: 'scroll'; direction: 'down' | 'up'; steps?: number; reason: string }
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
   let browser: any = null
@@ -228,6 +224,9 @@ export async function POST(request: NextRequest) {
           // Ask AI for an interaction plan
           let planned: PlannedAction[] = []
           try {
+            const openai = new OpenAI({
+              apiKey: process.env.OPENAI_API_KEY,
+            })
             const planPrompt = `You are a web exploration agent. Your goal is to trigger API requests. Analyze the following clickable elements from ${url} and create a JSON array of up to 10 high-value actions. Actions can be 'click', 'type', or 'scroll'. Prioritize actions that reveal data, like search, filtering, or viewing content. Avoid generic navigation like "Terms of Service". Respond with only a valid JSON array of actions. Elements: ${JSON.stringify(clickables, null, 2)}`
             
             const planResp = await openai.chat.completions.create({
@@ -257,7 +256,9 @@ export async function POST(request: NextRequest) {
             checkTimeout(`interaction-${step.action}`)
             try {
               if (!page) break
-              sendSSE({ type: 'log', message: `Executing: ${step.action} on "${step.selector || 'page'}" (Reason: ${step.reason})` })
+
+              const target = 'selector' in step ? `"${step.selector}"` : 'page'
+              sendSSE({ type: 'log', message: `Executing: ${step.action} on ${target} (Reason: ${step.reason})` })
 
               if (step.action === 'scroll') {
                 for (let i = 0; i < (step.steps || 5); i++) {
