@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 
 interface AdvancedLoaderProps {
   onComplete: () => void
@@ -92,9 +93,11 @@ export default function AdvancedLoader({ onComplete }: AdvancedLoaderProps) {
         {/* Logo with animation */}
         <div className="mb-12">
           <div className="relative inline-block">
-            <img 
-              src="/hb.svg" 
-              alt="Ziro" 
+            <Image
+              src="/hb.svg"
+              alt="Ziro"
+              width={64}
+              height={64}
               className="w-16 h-16 mx-auto mb-4 animate-pulse"
               style={{
                 filter: 'drop-shadow(0 0 20px rgba(240, 255, 38, 0.5))'

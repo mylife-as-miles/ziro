@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { Github, Twitter, Linkedin, Mail, ExternalLink } from 'lucide-react'
 
 export default function Footer() {
@@ -12,7 +13,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1 sm:col-span-2">
             <div className="flex items-center space-x-3 mb-4 sm:mb-6">
-              <img src="/hb.svg" alt="Ziro" className="w-6 h-6 sm:w-8 sm:h-8" />
+              <Image src="/hb.svg" alt="Ziro" width={32} height={32} className="w-6 h-6 sm:w-8 sm:h-8" />
               <span className="text-xl sm:text-2xl font-bold text-white">
                 Zir<span style={{ color: '#F0FF26' }}>0</span>
               </span>

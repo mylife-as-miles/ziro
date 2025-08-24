@@ -8,30 +8,6 @@ export default function TestimonialsSection() {
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const sectionRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-        }
-      },
-      { threshold: 0.3 }
-    )
-
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-
-    return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveTestimonial(prev => (prev + 1) % testimonials.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [])
-
   const testimonials = [
     {
       name: "Sarah Chen",
@@ -105,6 +81,30 @@ export default function TestimonialsSection() {
     }
   ]
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [testimonials.length])
+
   return (
     <section id="testimonials" ref={sectionRef} className="relative py-24 lg:py-32 bg-gradient-to-b from-black via-gray-900 to-black overflow-hidden">
       {/* Enhanced background effects */}
@@ -148,7 +148,7 @@ export default function TestimonialsSection() {
           </h2>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            See what industry experts are saying about Ziro's revolutionary approach to API discovery and security testing.
+            See what industry experts are saying about Ziro&apos;s revolutionary approach to API discovery and security testing.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function TestimonialsSection() {
                   <blockquote className={`text-lg leading-relaxed mb-6 transition-colors duration-300 ${
                     isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
                   }`}>
-                    "{testimonial.text}"
+                    &quot;{testimonial.text}&quot;
                   </blockquote>
 
                   {/* Highlight */}
