@@ -243,7 +243,7 @@ export default function EnhancedDashboard({
         domainAnalysis: {
           subdomains: ['api.example.com', 'admin.example.com', 'internal.example.com'],
           technologies: ['Node.js', 'Express', 'MongoDB', 'Redis', 'Docker'],
-          certificates: ['Let\'s Encrypt', 'Wildcard SSL', 'Extended Validation']
+          certificates: ['Let&apos;s Encrypt', 'Wildcard SSL', 'Extended Validation']
         },
         performanceMetrics: {
           avgResponseTime: 245,
@@ -945,10 +945,10 @@ export default function EnhancedDashboard({
                           <span>API Integration</span>
                         </h4>
                         <div className="bg-gray-900/50 rounded-xl p-4 font-mono text-sm">
-                          <div className="text-gray-400 mb-2">// Example: Integrate with your CI/CD pipeline</div>
+                          <div className="text-gray-400 mb-2">{/* Example: Integrate with your CI/CD pipeline */}</div>
                           <div className="text-green-400">curl -X POST https://api.ziro.dev/v1/discover \</div>
-                          <div className="text-blue-400 ml-4">-H "Authorization: Bearer YOUR_API_KEY" \</div>
-                          <div className="text-yellow-400 ml-4">-d '{`{"target": "https://api.example.com"}`}'</div>
+                          <div className="text-blue-400 ml-4">-H &quot;Authorization: Bearer YOUR_API_KEY&quot; \</div>
+                          <div className="text-yellow-400 ml-4">-d &apos;{`{`}&quot;target&quot;: &quot;https://api.example.com&quot;{`}`}&apos;</div>
                         </div>
                       </div>
                     </div>

@@ -127,7 +127,7 @@ export default function LandingPage() {
               
               {/* Enhanced subtitle */}
               <p className="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-4xl mx-auto mb-8 leading-relaxed">
-                See the future of API discovery in action. Watch as Ziro's AI uncaps hidden endpoints 
+                See the future of API discovery in action. Watch as Ziro&apos;s AI uncaps hidden endpoints
                 and generates comprehensive documentation in real-time.
               </p>
               

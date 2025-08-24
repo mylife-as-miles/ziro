@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { ExternalLink, Github, BookOpen } from 'lucide-react'
 
 export default function Navbar() {
@@ -9,7 +10,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <img src="/hb.svg" alt="Hyperbrowser" className="w-6 h-6" />
+            <Image src="/hb.svg" alt="Hyperbrowser" width={24} height={24} className="w-6 h-6" />
             <span className="text-xl font-bold text-white tracking-tight4">
               deep<span style={{ color: '#F0FF26' }}>crawler</span>
             </span>

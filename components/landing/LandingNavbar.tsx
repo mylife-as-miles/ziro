@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { Menu, X, ExternalLink, Github, BookOpen, Sparkles } from 'lucide-react'
 
 export default function LandingNavbar() {
@@ -32,7 +33,7 @@ export default function LandingNavbar() {
             {/* Enhanced Logo */}
             <div className="flex items-center space-x-3 group cursor-pointer">
               <div className="relative">
-                <img src="/hb.svg" alt="Ziro" className="w-8 h-8 lg:w-10 lg:h-10 group-hover:scale-110 transition-transform duration-300" />
+                <Image src="/hb.svg" alt="Ziro" width={40} height={40} className="w-8 h-8 lg:w-10 lg:h-10 group-hover:scale-110 transition-transform duration-300" />
                 <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur group-hover:bg-yellow-400/40 transition-all duration-300" />
               </div>
               <span className="text-xl lg:text-2xl font-bold text-white tracking-tight group-hover:text-yellow-400 transition-colors duration-300">

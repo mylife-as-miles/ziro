@@ -30,7 +30,7 @@ export default function TestimonialsSection() {
       setActiveTestimonial(prev => (prev + 1) % testimonials.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [testimonials.length])
 
   const testimonials = [
     {
@@ -148,7 +148,7 @@ export default function TestimonialsSection() {
           </h2>
           
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            See what industry experts are saying about Ziro's revolutionary approach to API discovery and security testing.
+            See what industry experts are saying about Ziro&apos;s revolutionary approach to API discovery and security testing.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function TestimonialsSection() {
                   <blockquote className={`text-lg leading-relaxed mb-6 transition-colors duration-300 ${
                     isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
                   }`}>
-                    "{testimonial.text}"
+                    &quot;{testimonial.text}&quot;
                   </blockquote>
 
                   {/* Highlight */}
