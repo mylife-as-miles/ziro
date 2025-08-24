@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
+import OpenAI from 'openai'
 import { Hyperbrowser } from '@hyperbrowser/sdk'
 import { dedupeEndpoints, generatePostmanCollection } from '../../../lib/utils'
 
@@ -9,16 +10,26 @@ const RATE_LIMIT_WINDOW = 60 * 60 * 1000 // 1 hour
 const MAX_REQUESTS = 1
 
 // Timeout constants for serverless environments
-const MAX_EXECUTION_TIME = 25000 // 25 seconds (well under typical 30s serverless limit)
+const MAX_EXECUTION_TIME = 45000 // 45 seconds, extended for AI processing
 const PAGE_LOAD_TIMEOUT = 15000 // 15 seconds for page load
-const INTERACTION_TIMEOUT = 8000 // 8 seconds for user interactions
+const INTERACTION_TIMEOUT = 20000 // 20 seconds for AI-driven interactions
 
 interface ApiEndpoint {
   method: string
   url: string
   status: number
   size: number
+  contentType?: string
 }
+
+type PlannedAction =
+  | { action: 'click'; selector: string; reason: string }
+  | { action: 'type'; selector: string; text: string; reason: string; submitWithEnter?: boolean }
+  | { action: 'scroll'; direction: 'down' | 'up'; steps?: number; reason: string }
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
@@ -59,9 +70,9 @@ export async function POST(request: NextRequest) {
     
     rateLimitMap.set(clientIP, now)
 
-    // Initialize Hyperbrowser
-    if (!process.env.HYPERBROWSER_API_KEY) {
-      throw new Error('HYPERBROWSER_API_KEY is not configured')
+    // Initialize Hyperbrowser & OpenAI
+    if (!process.env.HYPERBROWSER_API_KEY || !process.env.OPENAI_API_KEY) {
+      throw new Error('HYPERBROWSER_API_KEY and OPENAI_API_KEY must be configured')
     }
 
     hb = new Hyperbrowser({
@@ -81,10 +92,10 @@ export async function POST(request: NextRequest) {
         }
 
         // Helper function to check if we're running out of time
-        const checkTimeout = () => {
+        const checkTimeout = (label: string) => {
           const elapsed = Date.now() - startTime
           if (elapsed > MAX_EXECUTION_TIME) {
-            throw new Error('Operation timeout - execution time limit reached')
+            throw new Error(`Operation timeout at '${label}' - execution time limit reached`)
           }
           return elapsed
         }
@@ -98,241 +109,199 @@ export async function POST(request: NextRequest) {
           sendSSE({ type: 'log', message: `Starting crawl for ${url}` })
           sendSSE({ type: 'progress', progress: 5 })
 
-          checkTimeout()
+          checkTimeout('session-start')
 
           // Create browser session with timeout
           console.log('Creating browser session...')
           session = await Promise.race([
-            hb.sessions.create({
-              useStealth: true,
-              useProxy: true
-            }),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Browser session creation timeout')), 10000)
-            )
+            hb.sessions.create({ useStealth: true, useProxy: true }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Browser session creation timeout')), 10000))
           ])
 
           sendSSE({ type: 'log', message: 'Browser session created' })
-          sendSSE({ type: 'progress', progress: 15 })
+          sendSSE({ type: 'progress', progress: 10 })
 
-          checkTimeout()
+          checkTimeout('puppeteer-connect')
 
-          // Connect with Puppeteer with timeout
-          console.log('Connecting to browser...')
+          // Connect with Puppeteer
           const { connect } = await import('puppeteer-core')
           browser = await Promise.race([
-            connect({
-              browserWSEndpoint: session.wsEndpoint,
-              defaultViewport: null,
-            }),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Browser connection timeout')), 8000)
-            )
+            connect({ browserWSEndpoint: session.wsEndpoint, defaultViewport: null }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Browser connection timeout')), 8000))
           ])
 
           const [page] = await browser.pages()
           let requestCount = 0
 
           sendSSE({ type: 'log', message: 'Connected to browser' })
-          sendSSE({ type: 'progress', progress: 20 })
+          sendSSE({ type: 'progress', progress: 15 })
 
-          checkTimeout()
+          checkTimeout('request-monitoring-setup')
 
-          // Set up request monitoring with error handling
-          page.on('requestfinished', (request: any) => {
+          // Network instrumentation
+          page.on('requestfinished', async (req: any) => {
             try {
-              const response = request.response()
-              if (response) {
-                const method = request.method()
-                const reqUrl = request.url()
-                const status = response.status()
-                const headers = response.headers()
-                const size = parseInt(headers['content-length'] || '0', 10)
-                const contentType = headers['content-type'] || ''
+              const res = req.response()
+              if (!res) return
+              const status = res.status()
+              const headers = res.headers()
+              const method = req.method()
+              const reqUrl = req.url()
+              const contentType = headers['content-type'] || ''
+              const size = parseInt(headers['content-length'] || '0', 10)
 
-                // Skip static assets and analytics
-                const skipPatterns = [
-                  /\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i,
-                  /google-analytics|googletagmanager|facebook|twitter|linkedin/i,
-                  /posthog|mixpanel|segment|amplitude|hotjar/i,
-                  /cdn\.|assets\.|static\./i
-                ]
+              const skipPatterns = [
+                /\.(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$/i,
+                /google-analytics|googletagmanager|facebook|twitter|linkedin/i,
+                /posthog|mixpanel|segment|amplitude|hotjar/i,
+                /cdn\.|assets\.|static\./i,
+              ]
+              const isStaticAsset = skipPatterns.some((p) => p.test(reqUrl))
 
-                const isStaticAsset = skipPatterns.some(pattern => pattern.test(reqUrl))
-                
-                // Enhanced API detection patterns
-                const isApiEndpoint = !isStaticAsset && (
-                  reqUrl.includes('/api/') ||
-                  reqUrl.includes('/v1/') || reqUrl.includes('/v2/') || reqUrl.includes('/v3/') ||
-                  reqUrl.match(/\/(api|rest|graphql|gql)\//i) ||
-                  reqUrl.includes('.json') ||
-                  contentType.includes('application/json') ||
-                  contentType.includes('application/api') ||
-                  contentType.includes('text/plain') && (method === 'POST' || method === 'PUT') ||
-                  (method !== 'GET' && !isStaticAsset) ||
-                  reqUrl.match(/\/(auth|login|logout|user|users|data|config|settings)/i) ||
-                  reqUrl.match(/\/(submit|upload|download|search|query)/i) ||
-                  reqUrl.match(/\/(repos|repositories|gists|notifications|issues|pulls)/i) ||
-                  reqUrl.match(/\/(orgs|organizations|teams|projects|actions)/i) ||
-                  reqUrl.match(/\/(graphql|rest|api|_private|internal)/i) ||
-                  [200, 201, 202, 400, 401, 403, 404, 422, 500, 502, 503].includes(status) && 
-                  !reqUrl.includes('favicon') && 
-                  !reqUrl.includes('robots.txt')
-                )
+              const isApiEndpoint = !isStaticAsset && (
+                reqUrl.includes('/api/') || reqUrl.includes('/v1/') || reqUrl.includes('/v2/') || reqUrl.includes('/v3/') ||
+                /\/(api|rest|graphql|gql)\//i.test(reqUrl) || reqUrl.includes('.json') ||
+                contentType.includes('application/json') || contentType.includes('application/api') ||
+                (contentType.includes('text/plain') && (method === 'POST' || method === 'PUT')) ||
+                method !== 'GET' ||
+                /\/(auth|login|logout|user|users|data|config|settings)/i.test(reqUrl) ||
+                /\/(submit|upload|download|search|query)/i.test(reqUrl)
+              )
 
-                if (isApiEndpoint) {
-                  endpoints.push({ method, url: reqUrl, status, size })
-                  
-                  const logMessage = `${method} ${reqUrl} → ${status} (${contentType})`
-                  sendSSE({ type: 'log', message: logMessage })
-                  
-                  requestCount++
-                  progress = Math.min(10 + (requestCount * 2), maxProgress)
-                  sendSSE({ type: 'progress', progress })
-                }
+              if (isApiEndpoint) {
+                endpoints.push({ method, url: reqUrl, status, size, contentType })
+                const logMessage = `${method} ${reqUrl} → ${status} (${contentType})`
+                sendSSE({ type: 'log', message: logMessage })
+                requestCount++
+                progress = Math.min(15 + requestCount * 2, maxProgress)
+                sendSSE({ type: 'progress', progress })
               }
-            } catch (err) {
-              console.warn('Error processing request:', err)
-            }
+            } catch (err) { /* swallow */ }
           })
 
           sendSSE({ type: 'log', message: `Navigating to ${url}` })
-          
-          checkTimeout()
+          await page.goto(url, { waitUntil: 'domcontentloaded', timeout: PAGE_LOAD_TIMEOUT })
+          await page.waitForTimeout(3000) // Settle
 
-          // Navigate to the URL with strict timeout
-          console.log('Navigating to page...')
+          sendSSE({ type: 'log', message: 'Page loaded, analyzing DOM for interactions' })
+          sendSSE({ type: 'progress', progress: 30 })
+
+          checkTimeout('dom-analysis')
+
+          // Snapshot of likely-clickable elements
+          const clickables = await page.evaluate(() => {
+            function cssPath(el: Element): string {
+              if (!(el instanceof Element)) return ''
+              if (el.id) return `#${el.id}`
+              let path: string[] = []
+              while (el && el.nodeType === Node.ELEMENT_NODE) {
+                let selector = el.nodeName.toLowerCase()
+                if (el.className) {
+                  const classes = (el.className as string).split(/\s+/).filter(Boolean).slice(0, 2).join('.')
+                  if (classes) selector += `.${classes}`
+                }
+                const parent = el.parentNode as Element
+                if (parent) {
+                  const siblings = Array.from(parent.children).filter(s => s.nodeName === el.nodeName)
+                  if (siblings.length > 1) {
+                    selector += `:nth-of-type(${siblings.indexOf(el) + 1})`
+                  }
+                }
+                path.unshift(selector)
+                el = parent
+              }
+              return path.join(' > ')
+            }
+            const nodes = Array.from(document.querySelectorAll('a,button,[role="button"],[onclick],input[type="submit"],.btn')).slice(0, 150)
+            return nodes.map(el => ({
+              tag: el.tagName.toLowerCase(),
+              text: (el as HTMLElement).innerText?.trim().slice(0, 100) || el.getAttribute('aria-label') || '',
+              selector: cssPath(el),
+            }))
+          })
+
+          sendSSE({ type: 'log', message: `Asking AI to plan high-signal interactions...` })
+          sendSSE({ type: 'progress', progress: 40 })
+
+          checkTimeout('ai-planning')
+
+          // Ask AI for an interaction plan
+          let planned: PlannedAction[] = []
           try {
-            await Promise.race([
-              page.goto(url, { 
-                waitUntil: 'domcontentloaded',
-                timeout: PAGE_LOAD_TIMEOUT
-              }),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Page navigation timeout')), PAGE_LOAD_TIMEOUT)
-              )
-            ])
+            const planPrompt = `You are a web exploration agent. Your goal is to trigger API requests. Analyze the following clickable elements from ${url} and create a JSON array of up to 10 high-value actions. Actions can be 'click', 'type', or 'scroll'. Prioritize actions that reveal data, like search, filtering, or viewing content. Avoid generic navigation like "Terms of Service". Respond with only a valid JSON array of actions. Elements: ${JSON.stringify(clickables, null, 2)}`
             
-            // Brief wait for additional requests
-            await Promise.race([
-              page.waitForTimeout(2000),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('Additional wait timeout')), 3000)
-              )
-            ])
-          } catch (error: unknown) {
-            console.log('Page load error:', (error as Error).message)
-            sendSSE({ type: 'log', message: `Page load issue: ${(error as Error).message}, continuing with analysis` })
+            const planResp = await openai.chat.completions.create({
+              model: 'gpt-4o',
+              messages: [{ role: 'user', content: planPrompt }],
+              temperature: 0.1,
+              response_format: { type: 'json_object' },
+            });
+
+            const raw = planResp.choices[0].message.content || '[]'
+            const result = JSON.parse(raw)
+            planned = (result.actions || result).slice(0, 10) // Handle nested "actions" key
+          } catch (err: any) {
+            console.error('AI planning failed:', err.message)
+            sendSSE({ type: 'log', message: 'AI planning failed, falling back to simple interactions.' })
+            // Fallback plan
+            planned = [
+              { action: 'scroll', direction: 'down', steps: 5, reason: 'Fallback scroll' },
+            ]
           }
 
-          sendSSE({ type: 'log', message: 'Page loaded, analyzing network traffic' })
+          sendSSE({ type: 'log', message: `AI planned ${planned.length} interactions. Executing now.` })
           sendSSE({ type: 'progress', progress: 50 })
 
-          checkTimeout()
+          // Execute AI-driven plan
+          for (const step of planned) {
+            checkTimeout(`interaction-${step.action}`)
+            try {
+              if (!page) break
+              sendSSE({ type: 'log', message: `Executing: ${step.action} on "${step.selector || 'page'}" (Reason: ${step.reason})` })
 
-          // Trigger user interactions with strict timeout
-          sendSSE({ type: 'log', message: 'Simulating user interactions to discover APIs' })
-          
-          try {
-            console.log('Starting user interactions...')
-            await Promise.race([
-              (async () => {
-                // Quick scroll to trigger lazy loading
-                await page.evaluate(() => {
-                  return new Promise((resolve) => {
-                    let totalHeight = 0
-                    const distance = 200 // Larger steps for faster scrolling
-                    const timer = setInterval(() => {
-                      window.scrollBy(0, distance)
-                      totalHeight += distance
-                      
-                      if(totalHeight >= Math.min(document.body.scrollHeight, 2000)) { // Limit scroll depth
-                        clearInterval(timer)
-                        resolve(null)
-                      }
-                    }, 50) // Faster scrolling
-                  })
-                })
-                
-                // Quick click on common interactive elements
-                const clickableSelectors = [
-                  'button', '.btn', '[role="button"]',
-                  '.nav-link', '.menu-item', 
-                  '.js-site-search-form', '.header-search-button'
-                ]
-                
-                for (const selector of clickableSelectors.slice(0, 3)) { // Limit selectors
-                  try {
-                    const elements = await page.$$(selector)
-                    if (elements.length > 0) {
-                      await elements[0].click({ delay: 50 })
-                      await page.waitForTimeout(300) // Shorter wait
-                    }
-                  } catch (err) {
-                    // Continue if clicking fails
-                  }
-                  
-                  checkTimeout() // Check timeout during interactions
+              if (step.action === 'scroll') {
+                for (let i = 0; i < (step.steps || 5); i++) {
+                  await page.evaluate((dir: 'down' | 'up') => window.scrollBy(0, dir === 'down' ? 400 : -400), step.direction)
+                  await page.waitForTimeout(300)
                 }
-                
-                // Quick form interaction
-                try {
-                  const searchInput = await page.$('input[type="search"], input[name*="search"]')
-                  if (searchInput) {
-                    await searchInput.type('test', { delay: 50 })
-                    await page.waitForTimeout(500)
-                  }
-                } catch (err) {
-                  // Continue if search fails
+              } else if (step.action === 'click' && step.selector) {
+                const el = await page.$(step.selector)
+                if (el) await el.click({ delay: 80 })
+              } else if (step.action === 'type' && step.selector) {
+                const el = await page.$(step.selector)
+                if (el) {
+                  await el.type(step.text, { delay: 50 })
+                  if (step.submitWithEnter) await el.press('Enter')
                 }
-              })(),
-              new Promise((_, reject) => 
-                setTimeout(() => reject(new Error('User interaction timeout')), INTERACTION_TIMEOUT)
-              )
-            ])
-          } catch (error: unknown) {
-            console.log('User interaction error:', (error as Error).message)
-            sendSSE({ type: 'log', message: `User interaction completed: ${(error as Error).message}` })
+              }
+              await page.waitForTimeout(1000) // Wait for network requests
+            } catch (err: any) {
+              sendSSE({ type: 'log', message: `Interaction failed: ${err.message}` })
+            }
           }
           
-          sendSSE({ type: 'progress', progress: 70 })
-          
-          checkTimeout()
-          
-          // Brief final wait for API calls
-          await Promise.race([
-            new Promise(resolve => setTimeout(resolve, 1500)),
-            new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Final wait timeout')), 2000)
-            )
-          ]).catch(() => {
-            // Continue if final wait times out
-          })
+          sendSSE({ type: 'progress', progress: 75 })
+          await new Promise(r => setTimeout(r, 3000)) // Final network settle
+
+          checkTimeout('cleanup')
+          if (browser) await browser.close().catch((e: any) => console.warn('Browser close error', e.message))
+          if (session && hb) await hb.sessions.stop(session.id).catch((e: any) => console.warn('Session stop error', e.message))
           
           sendSSE({ type: 'log', message: 'Processing discovered endpoints' })
-          sendSSE({ type: 'progress', progress: 80 })
+          sendSSE({ type: 'progress', progress: 85 })
 
-          // Clean up resources
-          console.log('Cleaning up resources...')
-          if (browser) {
-            await browser.close().catch((err: any) => console.warn('Browser close error:', err))
-          }
-          if (session && hb) {
-            await hb.sessions.stop(session.id).catch((err: any) => console.warn('Session stop error:', err))
-          }
-          
-          // Process results
           const uniqueEndpoints = dedupeEndpoints(endpoints)
           const postmanCollection = generatePostmanCollection(url, uniqueEndpoints)
           
           sendSSE({ type: 'progress', progress: 95 })
-          sendSSE({ type: 'log', message: `Crawl complete! Found ${uniqueEndpoints.length} unique endpoints` })
+          sendSSE({ type: 'log', message: `Crawl complete! Found ${uniqueEndpoints.length} unique endpoints (model: gpt-4o)` })
 
           // Send final result
           sendSSE({
             type: 'complete',
             result: {
               crawlId,
+              model: 'gpt-4o',
               endpoints: uniqueEndpoints,
               postmanCollection
             }
@@ -342,28 +311,16 @@ export async function POST(request: NextRequest) {
           
         } catch (error) {
           console.error('Crawl error:', error)
-          sendSSE({ 
-            type: 'error',
-            message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` 
-          })
+          sendSSE({ type: 'error', message: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` })
           
-          // Ensure cleanup on error
           try {
-            if (browser) {
-              await browser.close().catch((err: any) => console.warn('Error cleanup - browser close:', err))
-            }
-            if (session && hb) {
-              await hb.sessions.stop(session.id).catch((err: any) => console.warn('Error cleanup - session stop:', err))
-            }
-          } catch (cleanupError) {
-            console.warn('Cleanup error:', cleanupError)
-          }
+            if (browser) await browser.close().catch((e:any) => {})
+            if (session && hb) await hb.sessions.stop(session.id).catch((e:any) => {})
+          } catch {}
         } finally {
           try {
             controller.close()
-          } catch (closeError) {
-            console.warn('Controller close error:', closeError)
-          }
+          } catch {}
         }
       }
     })
@@ -382,17 +339,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API error:', error)
     
-    // Ensure cleanup on outer error
     try {
-      if (browser) {
-        await browser.close().catch((err: any) => console.warn('Outer error cleanup - browser close:', err))
-      }
-      if (session && hb) {
-        await hb.sessions.stop(session.id).catch((err: any) => console.warn('Outer error cleanup - session stop:', err))
-      }
-    } catch (cleanupError) {
-      console.warn('Outer cleanup error:', cleanupError)
-    }
+      if (browser) await browser.close().catch((e:any) => {})
+      if (session && hb) await hb.sessions.stop(session.id).catch((e:any) => {})
+    } catch {}
     
     return new Response(
       error instanceof Error ? error.message : 'Internal server error',
